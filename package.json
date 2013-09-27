@@ -1,0 +1,28 @@
+{
+  "name": "appool",
+  "version": "0.0.3",
+  "description": "A little REST npm database",
+  "main": "appool.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "sh tests/start.sh",
+    "start": "node server.js"
+  },
+  "bin": {
+	  "appool": "./server.js"
+  },
+  "dependencies" : {
+	  "restify" : ">=2.3.5",
+	  "utilities" : "git://github.com/tequnix/utilities.git"
+  },
+  "engine" : "node >= 0.8.0",
+  "repository": {
+	  "type": "git",
+	  "url" : "http://github.com/tequnix/appool.git"
+  },
+  "author": "Daniel Hassler",
+  "private": true,
+  "license": "BSD"
+}
