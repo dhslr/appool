@@ -2,8 +2,8 @@
 	"use strict";
 	var apps_dir = process.argv[2] || "./appool_apps",
 		url = require("url"),
-		utilities = require("utilities"),
-		discovery = utilities.discovery_provider.createDefaultProvider();
+		utilities = require("utilities");
+		//discovery = utilities.discovery_provider.createDefaultProvider();
 	require("fs").mkdir(apps_dir, function (err) {
 		if (err) {
 			console.log(err);
@@ -14,8 +14,8 @@
 		appool.listen(port, function (uri) {
 			var parsed = url.parse(uri);
 			console.log("Appool listening on " + uri);
-			discovery.createAdvertisement(Number(parsed.port), "appool"); 
-			discovery.startAdvertising();
+			//discovery.createAdvertisement(Number(parsed.port), "appool"); 
+			//discovery.startAdvertising();
 		});
 	});
 })();
