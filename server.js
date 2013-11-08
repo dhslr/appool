@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 (function () {
 	"use strict";
 	var apps_dir = process.argv[2] || "./appool_apps",
