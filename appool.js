@@ -66,7 +66,7 @@
 			// copy pkg to module folder
 			if (!err) {
 				fdata = fs.readFileSync(pkg_path);
-				fs.writeFile(path.join(data[0][1], "pkg.tgz"), fdata, function (err) {
+				fs.writeFile(path.join(data[data.length - 1][1], "pkg.tgz"), fdata, function (err) {
 					if (!err) {
 						fs.unlink(pkg_path);
 					} else {
