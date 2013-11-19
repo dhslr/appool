@@ -7,11 +7,11 @@
     "test": "tests"
   },
   "scripts": {
-    "test": "sh tests/start.sh",
-    "start": "node server.js"
+    "test": "sh ./tests/start.sh",
+    "start": "node ./server.js"
   },
   "bin": {
-	  "appool": "./server.js"
+	  "appool": "node ./server.js"
   },
   "dependencies" : {
 	  "restify" : ">=2.3.5",
@@ -22,7 +22,10 @@
 	  "type": "git",
 	  "url" : "http://github.com/tequnix/appool.git"
   },
-  "author": "Daniel Hassler",
+  "author": {
+	  "name" : "Daniel Hassler",
+	  "email" : "tequnix@gmail.com"
+  },
   "private": true,
   "license": "BSD"
 }
