@@ -92,9 +92,10 @@
 						if (err) {
 							res.send(new restify.InvalidContentError("Could not install package!"));
 						} else { 
+							console.log(idata);
 							update_apps(function () {
 								res.send(201, {
-									created: { path: "/apps/" + idata[0][0].split("@")[0]}
+									created: { path: "/apps/" + idata[idata.length - 1][0].split("@")[0]}
 								});
 							});
 						}
