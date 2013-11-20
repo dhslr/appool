@@ -37,8 +37,9 @@
 	exports.listen = function (port, cb) {
 		http_server.listen(port, function () {
 			if (typeof cb !== "undefined") {
-				update_apps();
-				cb(http_server.url);
+				update_apps(function () {
+					cb(http_server.url);
+				});
 			}
 		});
 	};
