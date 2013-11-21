@@ -4,6 +4,8 @@
 		apps = [],
 		path = require("path"),
 		fs = require("fs"),
+		os = require("os"),
+		crypto = require("crypto"),
 		restify = require("restify"),
 		utilities = require("utilities"),
 		npmUtil = utilities.npm_util,
@@ -26,6 +28,9 @@
 						rule: val.rule,
 						version: val.version
 					});
+					//correct pkg path
+					val.from = path.join(val.realPath, path.basename(val.from));
+					val.hash = fs.readFileSync(val.from + "-CHECKSUM").toString();
 				}
 			}
 			if (typeof cb === "function") {
@@ -60,15 +65,26 @@
 	
 	exports.install = install = function (pkg_path, cb) {
 		npmUtil.install(pkg_path, function (err, data) {
-			var fdata;
-			if (typeof cb === "function") {
-				cb(err, data);
-			}
+			var fdata,
+				fpath,
+				hpath,
+				name;
 			// copy pkg to module folder
 			if (!err) {
 				fdata = fs.readFileSync(pkg_path);
-				fs.writeFile(path.join(data[data.length - 1][1], "pkg.tgz"), fdata, function (err) {
+				//pkg dir + random name
+				fpath = path.join(data[data.length - 1][1], path.basename(pkg_path));
+				hpath = fpath + "-CHECKSUM";
+				fs.writeFile(fpath, fdata, function (err) {
+					var hash = crypto.createHash("sha1");
 					if (!err) {
+						hash.update(fdata);
+						fs.writeFile(hpath, hash.digest("hex"), function (err) {
+							if (err) {
+								console.log(err);
+								throw err;
+							}
+						});
 						fs.unlink(pkg_path);
 					} else {
 						console.log(err);
@@ -76,27 +92,52 @@
 					}
 				});
 			}
+			//extract pkg name
+			name = data[data.length - 1][0].split("@")[0];
+			if (typeof cb === "function") {
+				cb(err, {name: name, path: fpath, hash_path: hpath});
+			}
 		});
-	};
+	}
 
 	http_server.post("/apps/upload", pkgTransfer.handle_upload(function (err, data, res, next) {
-		var fpath = "./app.tgz";
+		var fpath,
+			hash;
 		if (err) {
 			res.send(err);
 		} else {
+			hash = crypto.createHash("sha1").update(data).digest("hex").toString();
+			for (var key in _apps) {
+				if (_apps.hasOwnProperty(key)) {
+					var app = _apps[key];
+					if (app.hash === hash) {
+						res.send(200, {
+							exists: {path: "/apps/" + app.name}
+						});
+						return next();
+					}
+				}
+			}
+			try {
+				//somethign like mktemp...
+				var buf = crypto.pseudoRandomBytes(12);
+				fpath = path.join(os.tmpdir(), buf.toString("hex") + ".tgz"); 
+			} catch (e) {
+				console.log(e);
+				throw e;
+			}
 			fs.writeFile(fpath, data, function (err) {
 				if (err) {
 					//console.log(err);
 					res.send(err);
 				} else {
-					install(fpath, function (err, idata) {
+					install(fpath, function (err, pkg) {
 						if (err) {
 							res.send(new restify.InvalidContentError("Could not install package!"));
 						} else { 
-							console.log(idata);
 							update_apps(function () {
 								res.send(201, {
-									created: { path: "/apps/" + idata[idata.length - 1][0].split("@")[0]}
+									created: { path: "/apps/" + pkg.name }
 								});
 							});
 						}
@@ -110,7 +151,7 @@
 	http_server.get("/apps/:name/download", function (req, res, next) {
 		var app = _apps[req.params.name];
 		if (typeof app !== "undefined") {
-			fs.readFile(path.join(app.realPath, "pkg.tgz"), function (err, data) {
+			fs.readFile(app.from, function (err, data) {
 				var disp;
 				if (err) {
 					res.send(err);
