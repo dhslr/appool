@@ -7,8 +7,8 @@ installed via npm. A list of all installed packages as well as
 information about a specific package can be obtained with simple GET
 requests. 
 
-Berry can be installed with npm:
+Appool can be installed with npm:
 
-    git clone https://github.com/tequnix/berry
+    git clone https://github.com/tequnix/appool
     cd berry
     npm install
