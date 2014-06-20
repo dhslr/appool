@@ -10,5 +10,5 @@ requests.
 Appool can be installed with npm:
 
     git clone https://github.com/tequnix/appool
-    cd berry
+    cd appool
     npm install
